@@ -1,0 +1,769 @@
+/* ========================= */
+/* 기본 설정 */
+/* ========================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    user-select: none;
+}
+
+body{
+    overflow:hidden;
+    font-family:"맑은 고딕",sans-serif;
+    background:white;
+}
+
+/* ========================= */
+/* 시작 화면 */
+/* ========================= */
+
+#mainMenu{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    z-index: 10;
+}
+
+.background{
+    position:absolute;
+    top: 0;
+    left: 0;
+    width:100%;
+    height:100%;
+    background:linear-gradient(
+        to bottom,
+        #ffffff,
+        #f2f2f2
+    );
+    z-index: 1;
+}
+
+.container{
+    position: relative;
+    z-index: 2;
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.menu{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:25px;
+}
+
+.menu h1{
+    font-size:60px;
+    font-weight:900;
+    color:#222;
+    text-shadow:3px 3px #cccccc;
+}
+
+.menu button{
+    width:250px;
+    height:70px;
+    font-size:28px;
+    font-weight:bold;
+    cursor:pointer;
+    border:4px solid black;
+    border-radius:12px;
+    background:#ffe680;
+    transition:.2s;
+}
+
+.menu button:hover{
+    transform:scale(1.05);
+    background:#ffd54f;
+}
+
+/* ========================= */
+/* 컷신 */
+/* ========================= */
+
+#cutscene{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:black;
+    overflow:hidden;
+}
+
+#sceneImage{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* ========================= */
+/* 스킵 */
+/* ========================= */
+
+#skip{
+    position:absolute;
+    top:20px;
+    right:20px;
+    width:120px;
+    height:45px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:18px;
+    font-weight:bold;
+    z-index:100;
+}
+
+/* ========================= */
+/* 컷신 대사 */
+/* ========================= */
+
+#dialogue{
+    position:absolute;
+    left:50%;
+    bottom:30px;
+    transform:translateX(-50%);
+    width:85%;
+    padding:22px;
+    background:rgba(0,0,0,.65);
+    color:white;
+    font-size:30px;
+    border:3px solid white;
+    border-radius:18px;
+}
+
+/* ========================= */
+/* 마지막 장면 */
+/* ========================= */
+
+#ending{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:black;
+    justify-content:center;
+    align-items:center;
+}
+
+#speech{
+    width:80%;
+    text-align:center;
+}
+
+#endingText{
+    color:white;
+    font-size:48px;
+    font-weight:bold;
+    line-height:1.6;
+}
+
+/* ========================= */
+/* 튜토리얼 스테이지 화면 UI */
+/* ========================= */
+
+#gameStage{
+    display:none; 
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    
+    /* [수정] 기존 흰색/단색 배경 대신 이미지를 덮어씌웁니다. */
+    background: url('images/forest.png') no-repeat center center;
+    background-size: cover; 
+    
+    flex-direction:column;
+    z-index: 5;
+}
+
+/* [추가] 배경 숲 이미지 위에 얹을 얇고 어두운 투명 필터입니다. 
+   배경의 화려함은 유지하되, UI가 뒤 배경에 묻혀 흐려지는 걸 완벽하게 방어합니다.
+*/
+#gameStage::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.45); /* 45% 반투명한 검은색 막 생성 */
+    z-index: 1;
+    pointer-events: none;
+}
+
+#battleField{
+    flex: 1;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 2; /* 반투명 배경보다 상위에 위치하도록 명시 */
+}
+
+/* 4대4 턴제 자리 배치를 위한 레이아웃 */
+.alliance-party{
+    position: absolute;
+    bottom: 110px; 
+    left: 50px;
+    display: flex;
+    gap: 20px;
+}
+
+.enemy-party{
+    position: absolute;
+    top: 60px;
+    right: 50px;
+    display: flex;
+    gap: 20px;
+}
+
+/* 캐릭터 슬롯 */
+.slot{
+    width: 100px;
+    height: 100px;
+    border: 3px dashed rgba(255, 255, 255, 0.4); /* 가시성 향상을 위해 선 두께와 불투명도 보정 */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* 아군 2번째 슬롯 (주인공) */
+.player-active {
+    border: 4px solid #ffe680;
+    /* 숲 배경 색감과 대조되도록 내부 방사형 그라데이션에 어두운 색을 섞어 캐릭터 테두리가 돋보이게 합니다 */
+    background: radial-gradient(circle, #f39c12 30%, rgba(44, 62, 80, 0.85) 90%);
+    box-shadow: 0 0 15px #ffe680;
+}
+
+/* 적군 2번째 슬롯 (훈련 봇 활성화) */
+.enemy-active {
+    border: 4px solid #ff7675;
+    background: radial-gradient(circle, #d63031 30%, rgba(44, 62, 80, 0.85) 90%);
+    box-shadow: 0 0 15px #ff7675;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.enemy-active:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 25px #ff7675;
+}
+
+.character-tag{
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    background: rgba(10, 10, 10, 0.85); /* 텍스트 가시성을 높이기 위해 더 진하게 변경 */
+    padding: 2px 8px;
+    border-radius: 5px;
+    position: absolute;
+    bottom: -10px;
+    white-space: nowrap;
+}
+
+.character-tag.red-tag {
+    background: rgba(192, 57, 43, 0.95);
+    border: 1px solid #ff7675;
+}
+
+/* 캐릭터 클릭 시 뜨는 정보/액션 패널 — 항상 화면 오른쪽 끝에 고정 */
+#targetInfo {
+    display: none;
+    position: fixed;
+    top: 50%;
+    right: 50px;
+    transform: translateY(-50%);
+    width: 300px;
+    background: rgba(10, 10, 10, 0.93);
+    border: 3px solid #ff7675;
+    border-radius: 12px;
+    padding: 18px;
+    color: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+    z-index: 20;
+    animation: slideDown 0.2s ease-out;
+}
+
+#targetInfo.ally-panel {
+    border-color: #ffe680;
+}
+
+/* 액션 버튼에 마우스를 올리면 왼쪽에 뜨는 설명 툴팁 */
+#actionTooltip {
+    display: none;
+    position: fixed;
+    max-width: 260px;
+    background: rgba(255, 230, 128, 0.15);
+    border: 1px solid #ffe680;
+    color: #ffe680;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    z-index: 25;
+    pointer-events: none;
+}
+
+/* 슬롯 안에 채워지는 캐릭터 이미지 */
+.slot .char-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* 현재 턴인 캐릭터 강조 */
+.slot.active-turn {
+    outline: 4px solid #fff;
+    outline-offset: 3px;
+    animation: pulseTurn 1s infinite;
+}
+
+@keyframes pulseTurn {
+    0%, 100% { outline-color: rgba(255,255,255,0.9); }
+    50% { outline-color: rgba(255,255,255,0.3); }
+}
+
+/* 패널 안 액션 버튼 영역 */
+.panel-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.panel-action-btn {
+    padding: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid #ffe680;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.panel-action-btn:hover {
+    background: #ffe680;
+    color: #222;
+}
+
+/* 항상 보이는 주인공 게이지 미니 HUD */
+#heroHud {
+    display: none;
+    position: fixed;
+    left: 50px;
+    bottom: 250px;
+    z-index: 12;
+    background: rgba(10, 10, 10, 0.88);
+    border: 2px solid #ffe680;
+    border-radius: 10px;
+    padding: 10px 16px;
+    color: white;
+    font-size: 13px;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 190px;
+}
+
+#heroHud .hud-title {
+    color: #ffe680;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+#heroHud .hud-energy {
+    display: flex;
+    gap: 4px;
+}
+
+#heroHud .hud-energy-cell {
+    flex: 1;
+    height: 11px;
+    background: #252525;
+    border: 1.5px solid #111;
+    border-radius: 2px;
+}
+
+#heroHud .hud-energy-cell.filled {
+    background: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.8);
+}
+
+#heroHud .hud-ult {
+    color: #9b59b6;
+    font-weight: bold;
+}
+
+/* 턴 진행 중 사용 불가능한 액션 버튼 */
+.panel-action-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    border-color: #777;
+}
+
+.panel-action-btn:disabled:hover {
+    background: rgba(255,255,255,0.08);
+    color: white;
+}
+
+/* 상단 턴 표시 */
+#turnIndicator {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    padding: 8px 22px;
+    background: rgba(10,10,10,0.85);
+    border: 2px solid #ffe680;
+    border-radius: 30px;
+    color: #ffe680;
+    font-weight: bold;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+/* 승패 결과 화면 */
+#battleResult {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.85);
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 42px;
+    font-weight: 900;
+    text-align: center;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.info-title {
+    font-size: 20px;
+    color: #ff7675;
+    margin-bottom: 10px;
+}
+
+.info-hp-wrapper {
+    position: relative;
+    width: 100%;
+    height: 20px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.info-hp-bar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, #d63031, #ff7675);
+}
+
+.info-hp-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+}
+
+.info-desc {
+    font-size: 14px;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+/* ======================================= */
+/* 우측 플로팅 인터페이스 그룹               */
+/* ======================================= */
+
+.right-interface-group {
+    position: absolute;
+    right: 50px;
+    bottom: 40px; 
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; 
+    gap: 15px;
+    z-index: 15;
+}
+
+/* 주인공 HUD 디자인 */
+#heroStatusHUD {
+    display: flex;
+    flex-direction: column;
+    background: rgba(10, 10, 10, 0.92); /* 뒷 배경 대비 향상 */
+    padding: 12px 18px;
+    border: 2.5px solid #ffe680; 
+    border-radius: 12px;
+    gap: 8px;
+    width: 350px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 230, 128, 0.25);
+}
+
+.mini-hud-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hud-hero-name {
+    font-size: 14px;
+    color: #ffe680;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* 궁극기 구체 */
+.ult-circle-mini {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 3px solid #7f8c8d; 
+    background: radial-gradient(circle, #34495e, #1a252f);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+/* 궁극기가 활성화되었을 때 추가해줄 클래스 */
+.ult-circle-mini.ready {
+    border-color: #9b59b6;
+    background: radial-gradient(circle, #8e44ad, #2c3e50);
+    box-shadow: 0 0 15px rgba(155, 89, 182, 0.8);
+}
+
+#ultPercent {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.ult-label {
+    color: #bdc3c7;
+    font-size: 8px;
+    font-weight: bold;
+}
+
+/* 바 컨테이너 */
+.bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* HP 바 디자인 */
+.hp-bar-wrapper {
+    position: relative;
+    width: 100%;
+    height: 22px;
+    background: #111;
+    border: 2px solid #333;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.hp-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, #2ecc71, #27ae60);
+    transition: width 0.3s ease;
+}
+
+/* 100단위 간격선 */
+.hp-grids {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    pointer-events: none;
+}
+
+.grid {
+    flex: 1;
+    border-right: 1px dashed rgba(0, 0, 0, 0.4);
+}
+.grid:last-child {
+    border-right: none;
+}
+
+.hp-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: 900;
+    font-size: 11px;
+    text-shadow: 1px 1px 2px black;
+}
+
+/* 능력 게이지 */
+.energy-gauge {
+    display: flex;
+    gap: 5px;
+}
+
+.energy-cell {
+    flex: 1;
+    height: 12px;
+    background: #252525;
+    border: 1.5px solid #111;
+    border-radius: 2px;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+/* 능력이 충전되어 있는 칸 스타일 */
+.energy-cell.cell-active {
+    background: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.8);
+}
+
+/* 행동 조작 패널 */
+.action-panel {
+    display: flex;
+    gap: 12px;
+}
+
+.action-btn {
+    width: 110px;
+    height: 60px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background: rgba(10, 10, 10, 0.9); /* 버튼 내부 불투명도를 높여 숲 이미지와 분리 */
+    border: 3px solid #ffe680;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.1s;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+}
+
+.action-btn:hover {
+    transform: scale(1.05);
+    background: #34495e;
+}
+
+/* 궁극기 특수 버튼 스킨 */
+.action-btn.ult-active {
+    background: #8e44ad;
+    border-color: #9b59b6;
+    box-shadow: 0 0 12px #9b59b6;
+}
+
+.action-btn.ult-active:hover {
+    background: #9b59b6;
+}
+
+
+/* ========================= */
+/* 화면 효과용 레이어 */
+/* ========================= */
+
+#fade{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:black;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .7s ease;
+    z-index:9999;
+}
+
+#fade.glitch {
+    opacity: 1 !important;
+    background: 
+        repeating-radial-gradient(circle, rgba(255,255,255,0.05), rgba(0,0,0,0.2) 2px, rgba(0,0,0,0.8) 4px),
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 100%, 100% 4px, 6px 100%;
+    animation: glitch-anim 0.15s infinite;
+    transition: none !important; 
+}
+
+/* 지지직 노이즈 애니메이션 */
+@keyframes glitch-anim {
+    0% {
+        filter: contrast(150%) brightness(100%);
+        transform: translate(0, 0) skewX(0deg);
+    }
+    20% {
+        filter: contrast(200%) brightness(120%);
+        transform: translate(-3px, 2px) skewX(2deg);
+    }
+    40% {
+        filter: contrast(120%) brightness(80%);
+        transform: translate(2px, -1px) skewX(-1deg);
+    }
+    60% {
+        filter: contrast(180%) brightness(140%);
+        transform: translate(-1px, -2px) skewX(1deg);
+    }
+    80% {
+        filter: contrast(140%) brightness(90%);
+        transform: translate(3px, 1px) skewX(-2deg);
+    }
+    100% {
+        filter: contrast(160%) brightness(110%);
+        transform: translate(0, 0) skewX(0deg);
+    }
+}
+
+/* ========================= */
+/* 반응형 */
+/* ========================= */
+
+@media(max-width:900px){
+    .menu h1{
+        font-size:42px;
+    }
+    .menu button{
+        width:180px;
+        height:55px;
+        font-size:22px;
+    }
+    #dialogue{
+        font-size:22px;
+    }
+    #endingText{
+        font-size:32px;
+    }
+}
