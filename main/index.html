@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고양이의 기묘한 모험</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="mainMenu">
+
+        <div class="background"></div>
+
+        <div class="container">
+
+            <div class="menu">
+
+                <h1>고양이의 기묘한 모험</h1>
+
+                <button id="startBtn">
+                    시작하기
+                </button>
+
+                <button id="optionBtn">
+                    옵션
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div id="cutscene">
+
+        <button id="skip">
+            Skip ▶
+        </button>
+
+        <img
+            id="sceneImage"
+            src="images/cut1.png"
+            alt="컷신">
+
+        <div id="dialogue">
+            대사
+        </div>
+
+    </div>
+
+
+    <div id="ending">
+
+        <div id="speech">
+
+            <p id="endingText">
+                일어나
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div id="gameStage">
+
+        <div id="turnIndicator">아군의 턴</div>
+
+        <div id="heroHud"></div>
+
+        <!-- 캐릭터 클릭 시 뜨는 정보/액션 패널 (아군, 적군 공용) -->
+        <div id="targetInfo"></div>
+
+        <!-- 액션 버튼 위에 마우스를 올리면 뜨는 설명 -->
+        <div id="actionTooltip"></div>
+
+        <div id="battleField">
+            <div class="alliance-party" id="allyParty"></div>
+
+            <div class="enemy-party" id="enemyParty"></div>
+        </div>
+
+        <div id="battleResult" style="display:none;"></div>
+
+    </div>
+
+
+    <div id="fade"></div>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
