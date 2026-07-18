@@ -37,6 +37,11 @@ const mainMenu = document.getElementById("mainMenu");
 const startBtn = document.getElementById("startBtn");
 const optionBtn = document.getElementById("optionBtn");
 
+const optionsScreen = document.getElementById("optionsScreen");
+const closeOptionsBtn = document.getElementById("closeOptionsBtn");
+const volumeSlider = document.getElementById("volumeSlider");
+const volumeValue = document.getElementById("volumeValue");
+
 const cutscene = document.getElementById("cutscene");
 const sceneImage = document.getElementById("sceneImage");
 const dialogue = document.getElementById("dialogue");
@@ -61,6 +66,30 @@ const actionTooltipEl = document.getElementById("actionTooltip");
 
 let currentScene = 0;
 let skipped = false;
+
+// 음량 값 (0~100). 나중에 사운드를 추가하면 이 값을 Audio.volume(0~1)에
+// 연결하기만 하면 된다. 예: bgm.volume = masterVolume / 100;
+let masterVolume = 70;
+
+// ===========================
+// 옵션 화면
+// ===========================
+
+optionBtn.onclick = () => {
+    optionsScreen.style.display = "flex";
+};
+
+closeOptionsBtn.onclick = () => {
+    optionsScreen.style.display = "none";
+};
+
+volumeSlider.oninput = () => {
+    masterVolume = Number(volumeSlider.value);
+    volumeValue.innerText = masterVolume;
+
+    // 나중에 사운드가 생기면 여기서 실제 볼륨을 갱신하면 된다.
+    // 예: if(bgm) bgm.volume = masterVolume / 100;
+};
 
 // 타이머 변수 관리
 let cutsceneTimer = null;
@@ -450,25 +479,24 @@ function handleAllyAction(action){
     hideActionTooltip();
 
     setTimeout(() => {
-        const target = applyDamage("ally", action.dmg);
-
-        // 게이지 소모
+        // 게이지 소모/충전은 데미지 적용(=렌더링) 전에 먼저 반영해서 한 번에 그려지게 한다.
         if(action.energyCost > 0){
             hero.energy = Math.max(0, hero.energy - action.energyCost);
         }
         if(action.ultCost > 0){
             hero.ult = Math.max(0, hero.ult - action.ultCost);
         }
-        // 게이지 충전 (공격할 때마다)
         if(action.ultGain > 0){
             hero.ult = Math.min(hero.maxUlt, hero.ult + action.ultGain);
         }
-        // 기절 부여
+
+        const target = applyDamage("ally", action.dmg);
+
+        // 기절 부여 (태그 표시는 다음 렌더링 때 자연스럽게 반영됨)
         if(action.stun && target){
             target.stunned = true;
         }
 
-        renderAll();
         closeCharPanel();
 
         if(checkBattleEnd()) return;
@@ -476,19 +504,50 @@ function handleAllyAction(action){
         setTimeout(() => {
             battleLocked = false;
             advanceTurn();
-        }, 350);
+        }, 500);
     }, 400);
 }
 
 // 공격 측 반대 팀에서 맨 앞(살아있는) 대상을 찾아 데미지를 적용하고, 그 대상을 반환한다.
 function applyDamage(attackerSide, dmg){
     const targetTeam = (attackerSide === "ally") ? enemyTeam : allyTeam;
-    const target = targetTeam.find(c => c.hp > 0);
-    if(!target) return null;
+    const targetIndex = targetTeam.findIndex(c => c.hp > 0);
+    if(targetIndex === -1) return null;
 
+    const target = targetTeam[targetIndex];
     target.hp = Math.max(0, target.hp - dmg);
+
     renderAll();
+
+    // 맞은 대상의 슬롯에 임팩트 이펙트 + 데미지 숫자를 띄운다.
+    const targetSide = (attackerSide === "ally") ? "enemy" : "ally";
+    const containerEl = (targetSide === "ally") ? allyPartyEl : enemyPartyEl;
+    const slotEl = containerEl.querySelector('.slot[data-index="' + targetIndex + '"]');
+    if(slotEl){
+        playHitEffect(slotEl, dmg);
+    }
+
     return target;
+}
+
+// 맞은 슬롯에 번쩍임/흔들림 효과와 위로 떠오르는 데미지 숫자를 보여준다.
+function playHitEffect(slotEl, dmg){
+    // 슬롯이 여전히 캐릭터를 담고 있을 때만(=이번 공격으로 죽지 않았을 때만) 번쩍임 적용
+    if(slotEl.classList.contains("player-active") || slotEl.classList.contains("enemy-active")){
+        slotEl.classList.add("hit-flash");
+        setTimeout(() => slotEl.classList.remove("hit-flash"), 350);
+    }
+
+    const rect = slotEl.getBoundingClientRect();
+
+    const dmgEl = document.createElement("div");
+    dmgEl.className = "damage-popup";
+    dmgEl.innerText = "-" + dmg;
+    dmgEl.style.left = (rect.left + rect.width / 2) + "px";
+    dmgEl.style.top = (rect.top + rect.height / 2) + "px";
+
+    document.body.appendChild(dmgEl);
+    setTimeout(() => dmgEl.remove(), 900);
 }
 
 // ===========================

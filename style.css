@@ -84,6 +84,81 @@ body{
 }
 
 /* ========================= */
+/* 옵션 화면 */
+/* ========================= */
+
+#optionsScreen{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,.55);
+    z-index:20;
+    justify-content:center;
+    align-items:center;
+}
+
+.options-box{
+    width:380px;
+    background:#fff;
+    border:4px solid black;
+    border-radius:16px;
+    padding:30px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:22px;
+}
+
+.options-box h2{
+    font-size:28px;
+    font-weight:900;
+    color:#222;
+}
+
+.option-row{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.option-row label{
+    flex-shrink:0;
+    width:50px;
+}
+
+.option-row input[type="range"]{
+    flex:1;
+}
+
+.option-row span{
+    width:32px;
+    text-align:right;
+}
+
+#closeOptionsBtn{
+    width:140px;
+    height:50px;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    border:3px solid black;
+    border-radius:10px;
+    background:#ffe680;
+    transition:.2s;
+}
+
+#closeOptionsBtn:hover{
+    transform:scale(1.05);
+    background:#ffd54f;
+}
+
+/* ========================= */
 /* 컷신 */
 /* ========================= */
 
@@ -437,7 +512,53 @@ body{
     letter-spacing: 1px;
 }
 
-/* 승패 결과 화면 */
+/* 맞았을 때 슬롯이 번쩍이는 임팩트 효과 */
+.slot.hit-flash {
+    animation: hitFlash 0.35s ease;
+}
+
+@keyframes hitFlash {
+    0% {
+        filter: brightness(1) saturate(1);
+        transform: scale(1);
+    }
+    30% {
+        filter: brightness(2.4) saturate(2.2);
+        transform: scale(1.12);
+    }
+    100% {
+        filter: brightness(1) saturate(1);
+        transform: scale(1);
+    }
+}
+
+/* 위로 떠오르며 사라지는 데미지 숫자 */
+.damage-popup {
+    position: fixed;
+    transform: translate(-50%, -50%);
+    color: #ff5252;
+    font-size: 30px;
+    font-weight: 900;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.85), -1px -1px 0 rgba(0,0,0,0.85);
+    pointer-events: none;
+    z-index: 50;
+    animation: damagePopupFloat 0.9s ease-out forwards;
+}
+
+@keyframes damagePopupFloat {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -40%) scale(0.7);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -70%) scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -130%) scale(1);
+    }
+}
 #battleResult {
     position: fixed;
     top: 0;
