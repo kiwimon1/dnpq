@@ -87,15 +87,14 @@ function showEnding(){
             fade.classList.add("glitch");
 
             setTimeout(()=>{
-                // 지지직거리는 도중 "일어나" 화면을 뒤에서 끄고 튜토리얼 전장 스테이지를 활성화합니다.
+                // 지지직거리는 도중 "일어나" 화면을 뒤에서 끄고 스테이지 선택 화면을 켭니다.
                 ending.style.display = "none";
-                gameStage.style.display = "flex"; // 튜토리얼 UI 화면 켜기
 
-                // 전투 데이터/화면 초기화 (battle.js)
-                initBattle();
+                // 스테이지 선택 화면 열기 (stageSelect.js)
+                openStageSelect();
 
                 // ==========================================
-                // [튜토리얼 시작 지점] 
+                // [스테이지 선택 진입 지점] 
                 // ==========================================
                 // 6. 지지직거리던 노이즈를 끄고 정상적으로 화면을 다시 밝힙니다.
                 fade.classList.remove("glitch");
@@ -189,13 +188,3 @@ startBtn.onclick = ()=>{
 skip.onclick = ()=>{
     showEnding();
 }
-
-// ===========================
-// ESC
-// ===========================
-
-document.addEventListener("keydown",(e)=>{
-    if(e.key==="Escape"){
-        showEnding();
-    }
-});
