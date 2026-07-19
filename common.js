@@ -33,3 +33,16 @@ const enemyPartyEl = document.getElementById("enemyParty");
 const turnIndicatorEl = document.getElementById("turnIndicator");
 const battleResultEl = document.getElementById("battleResult");
 const actionTooltipEl = document.getElementById("actionTooltip");
+
+// 스테이지 선택 화면 요소
+const stageSelect = document.getElementById("stageSelect");
+const stageMapScroll = document.getElementById("stageMapScroll");
+const stageMapContent = document.getElementById("stageMapContent");
+const stageMapSvg = document.getElementById("stageMapSvg");
+const stageInfoPanel = document.getElementById("stageInfoPanel");
+
+// 일시정지 / 저장 화면 요소
+const pauseScreen = document.getElementById("pauseScreen");
+const pauseSaveBtn = document.getElementById("pauseSaveBtn");
+const pauseCloseBtn = document.getElementById("pauseCloseBtn");
+const pauseToast = document.getElementById("pauseToast");
