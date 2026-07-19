@@ -45,7 +45,7 @@
                     <span id="volumeValue">70</span>
                 </div>
 
-                <button id="closeOptionsBtn">닫기</button>
+                <button id="closeOptionsBtn" class="simple-btn">닫기</button>
 
             </div>
 
@@ -85,6 +85,19 @@
     </div>
 
 
+    <div id="stageSelect">
+
+        <div id="stageMapScroll">
+            <div id="stageMapContent">
+                <svg id="stageMapSvg"></svg>
+            </div>
+        </div>
+
+        <div id="stageInfoPanel"></div>
+
+    </div>
+
+
     <div id="gameStage">
 
         <div id="turnIndicator">아군의 턴</div>
@@ -108,13 +121,33 @@
     </div>
 
 
+    <div id="pauseScreen">
+
+        <div class="options-box">
+
+            <h2>일시정지</h2>
+
+            <button id="pauseSaveBtn" class="simple-btn">저장하기</button>
+
+            <p id="pauseToast" style="display:none;"></p>
+
+            <button id="pauseCloseBtn" class="simple-btn">닫기</button>
+
+        </div>
+
+    </div>
+
+
     <div id="fade"></div>
 
 
     <script src="common.js"></script>
+    <script src="stages.js"></script>
     <script src="options.js"></script>
     <script src="cutscene.js"></script>
+    <script src="stageSelect.js"></script>
     <script src="battle.js"></script>
+    <script src="pause.js"></script>
 
 </body>
 

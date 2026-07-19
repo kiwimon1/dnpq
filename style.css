@@ -141,7 +141,7 @@ body{
     text-align:right;
 }
 
-#closeOptionsBtn{
+.simple-btn{
     width:140px;
     height:50px;
     font-size:18px;
@@ -153,9 +153,181 @@ body{
     transition:.2s;
 }
 
-#closeOptionsBtn:hover{
+.simple-btn:hover{
     transform:scale(1.05);
     background:#ffd54f;
+}
+
+/* ========================= */
+/* 스테이지 선택 화면 */
+/* ========================= */
+
+#stageSelect{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    z-index:8;
+    /* 나중에 이미지로 교체: 배경 하나만 바꾸면 전체 반영됨 */
+    background: url('images/stagebg.png') no-repeat center top, linear-gradient(to bottom, #cfd8dc, #90a4ae);
+    background-size: cover, cover;
+}
+
+#stageSelect::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.35);
+    pointer-events:none;
+}
+
+#stageMapScroll{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    overflow-y:auto;
+    overflow-x:hidden;
+    z-index:2;
+}
+
+#stageMapContent{
+    position:relative;
+    width:100%;
+    min-height:100%;
+}
+
+#stageMapSvg{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:1;
+}
+
+.stage-path{
+    fill:none;
+    stroke:#fff3c4;
+    stroke-width:5;
+    stroke-linecap:round;
+    stroke-dasharray: 2 10;
+    vector-effect:non-scaling-stroke;
+    opacity:0.9;
+}
+
+/* 손그림 느낌의 비정형 원 노드 */
+.stage-node{
+    position:absolute;
+    transform:translate(-50%, -50%);
+    width:92px;
+    height:92px;
+    border-radius: 46% 54% 58% 42% / 52% 48% 55% 45%;
+    background: radial-gradient(circle, #ffe680 25%, #d68910 95%);
+    border:4px solid #fff8e1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(255,230,128,0.55);
+    cursor:pointer;
+    transition: transform 0.15s ease;
+    z-index:3;
+}
+
+.stage-node:hover{
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+.stage-node-label{
+    font-size:20px;
+    font-weight:900;
+    color:#3e2723;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+}
+
+.stage-node.cleared{
+    background: radial-gradient(circle, #b9f6ca 25%, #2ecc71 95%);
+}
+
+.stage-node-check{
+    position:absolute;
+    top:-12px;
+    right:-8px;
+    font-size:20px;
+    color:#f1c40f;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+}
+
+.stage-node.locked{
+    background: radial-gradient(circle, #b0b0b0 25%, #5a5a5a 95%);
+    cursor:default;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+
+.stage-node.locked:hover{
+    transform: translate(-50%, -50%);
+}
+
+.stage-node.locked .stage-node-label{
+    color:#eeeeee;
+    opacity:0.75;
+}
+
+.stage-node-lock{
+    position:absolute;
+    bottom:-14px;
+    font-size:16px;
+}
+
+#stageInfoPanel{
+    display:none;
+    position:fixed;
+    top:50%;
+    right:50px;
+    transform:translateY(-50%);
+    width:300px;
+    background: rgba(10,10,10,0.93);
+    border:3px solid #ffe680;
+    border-radius:12px;
+    padding:18px;
+    color:white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+    z-index:20;
+}
+
+#stageInfoPanel .panel-action-btn{
+    width:100%;
+    margin-top:12px;
+}
+
+/* ========================= */
+/* 일시정지 / 저장 화면 */
+/* ========================= */
+
+#pauseScreen{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,.6);
+    z-index:60;
+    justify-content:center;
+    align-items:center;
+}
+
+#pauseToast{
+    font-size:14px;
+    font-weight:bold;
+    color:#2ecc71;
 }
 
 /* ========================= */
@@ -256,7 +428,7 @@ body{
     height:100vh;
     
     /* [수정] 기존 흰색/단색 배경 대신 이미지를 덮어씌웁니다. */
-    background: url('images/forest.png') no-repeat center center;
+    background: url('images/forest.jpg') no-repeat center center;
     background-size: cover; 
     
     flex-direction:column;
@@ -568,12 +740,19 @@ body{
     background: rgba(0,0,0,0.85);
     z-index: 30;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 26px;
     color: white;
     font-size: 42px;
     font-weight: 900;
     text-align: center;
+}
+
+#battleResult .panel-action-btn{
+    width: 220px;
+    font-size: 18px;
 }
 
 @keyframes slideDown {
