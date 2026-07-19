@@ -11,7 +11,7 @@ let turnSide = "ally";   // "ally" | "enemy"
 let turnIndex = 0;       // 현재 행동 순번 (팀 배열 인덱스)
 let battleLocked = false; // 연출 중 중복 입력 방지
 
-function createInitialTeams(){
+function createHeroTeam(){
     allyTeam = [
         {
             id: "hero",
@@ -33,24 +33,17 @@ function createInitialTeams(){
         }
         // 나중에 아군이 늘어나면 여기에 객체만 추가하면 된다.
     ];
-
-    enemyTeam = [
-        {
-            id: "bot",
-            name: "훈련 봇",
-            hp: 1000,
-            maxHp: 1000,
-            img: "images/trainingbot.png",
-            desc: "연습을 위한 훈련 봇이다.",
-            atk: 40,
-            stunned: false
-        }
-        // 적이 늘어나면 여기에 객체만 추가하면 된다.
-    ];
 }
 
-function initBattle(){
-    createInitialTeams();
+// 스테이지 데이터의 적 목록을 얕은 복사해서 사용한다.
+// (그대로 참조하면 전투 중 깎인 HP가 stages.js의 원본 데이터에도 남아버림)
+function buildEnemyTeam(enemyDefs){
+    return enemyDefs.map(e => Object.assign({}, e));
+}
+
+function initBattle(stage){
+    createHeroTeam();
+    enemyTeam = buildEnemyTeam(stage.enemies);
     turnSide = "ally";
     turnIndex = 0;
     battleLocked = false;
@@ -91,10 +84,15 @@ function renderHeroHud(){
 }
 
 // 4자리 슬롯을 그리되, 캐릭터가 없거나 죽은 자리는 빈 점선 슬롯으로 남긴다.
+// 아군은 오른쪽(적과 가까운 쪽)부터, 적은 왼쪽(아군과 가까운 쪽)부터 채워져서
+// 서로 마주보는 대형이 되도록 시각적 순서만 반전시킨다. (턴 진행에 쓰이는
+// data-index는 실제 배열 인덱스를 그대로 유지하므로 다른 로직은 안 건드려도 됨)
 function renderTeam(team, containerEl, side){
     containerEl.innerHTML = "";
 
-    for(let i=0; i<4; i++){
+    const visualOrder = (side === "ally") ? [3, 2, 1, 0] : [0, 1, 2, 3];
+
+    visualOrder.forEach(i => {
         const slotEl = document.createElement("div");
         slotEl.className = "slot";
 
@@ -119,7 +117,7 @@ function renderTeam(team, containerEl, side){
         }
 
         containerEl.appendChild(slotEl);
-    }
+    });
 
     highlightActiveTurn();
 }
@@ -391,8 +389,22 @@ function checkBattleEnd(){
     if(enemyDown || allyDown){
         battleLocked = true;
         closeCharPanel();
-        battleResultEl.innerText = enemyDown ? "승리!" : "패배...";
+
+        if(enemyDown){
+            handleStageWin();  // stageSelect.js
+        } else {
+            handleStageLose(); // stageSelect.js
+        }
+
+        battleResultEl.innerHTML =
+            '<div>' + (enemyDown ? "승리!" : "패배...") + '</div>' +
+            '<button id="backToMapBtn" class="panel-action-btn">스테이지 목록으로</button>';
         battleResultEl.style.display = "flex";
+
+        document.getElementById("backToMapBtn").onclick = () => {
+            returnToStageSelect(); // stageSelect.js
+        };
+
         return true;
     }
     return false;
