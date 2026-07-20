@@ -1171,8 +1171,8 @@ body{
 
 .ultimate-slash {
     position: absolute;
-    width: 3000px;              /* 적 전체를 뒤덮는 거대 크기 */
-    height: 1200px;
+    width: 900px;              /* 적 전체를 뒤덮는 거대 크기 */
+    height: 300px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
