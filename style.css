@@ -419,19 +419,25 @@ body{
 /* 튜토리얼 스테이지 화면 UI */
 /* ========================= */
 
-#gameStage{
-    display:none; 
-    position:fixed;
-    top:0;
-    left:0;
-    width:100vw;
-    height:100vh;
+#gameStage {
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;       /* 화면 전체 가로 너비 */
+    height: 100vh;      /* 화면 전체 세로 높이 */
     
-    /* [수정] 기존 흰색/단색 배경 대신 이미지를 덮어씌웁니다. */
-    background: url('../images/forest.jpg') no-repeat center center;
-    background-size: cover; 
+    /* 💡 핵심: 4px x 4px 같은 픽셀 아트 이미지가 확대될 때 뭉개지지 않고 또렷하게 보이게 합니다. */
+    image-rendering: pixelated; 
+    image-rendering: crisp-edges;
+
+    /* 배경 설정 */
+    background-color: transparent;
+    background-size: cover;       /* 화면 전체에 채우기 (또는 100% 100%) */
+    background-position: center;
+    background-repeat: no-repeat;
     
-    flex-direction:column;
+    flex-direction: column;
     z-index: 5;
 }
 
@@ -1066,4 +1072,148 @@ body{
     #endingText{
         font-size:32px;
     }
+}
+
+/* ========================= */
+/* 참격 투사체 스타일 (160x160, 3배 천천히) */
+/* ========================= */
+
+.projectile {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: 100;
+    
+    /* 픽셀 아트 뭉개짐 방지 */
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    
+    /* 회전 중심점 (160x160 중앙) */
+    transform-origin: center center;
+    
+    /* 💡 이동 속도를 0.45초로 3배 천천히 조정 */
+    transition: left 0.45s linear, top 0.45s linear;
+}
+
+/* ========================= */
+/* 적군 공격(피격) 이펙트 스타일 */
+/* ========================= */
+
+/* ========================= */
+/* 적군 공격(피격) 이펙트 스타일 */
+/* ========================= */
+
+.hit-effect {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: 9999 !important;
+    
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    transform-origin: center center;
+
+    /* 등장할 때 확 커졌다가 천천히 사라지는 애니메이션 (0.45초) */
+    animation: hit-pop-fade 0.45s ease-out forwards;
+}
+
+/* 💡 피격 임팩트 & 천천히 사라짐 애니메이션 정의 */
+@keyframes hit-pop-fade {
+    0% {
+        opacity: 0;
+        transform: scale(0.6);       /* 처음엔 살짝 작은 상태 */
+    }
+    20% {
+        opacity: 1;
+        transform: scale(1.25);      /* 순간적으로 타격감 있게 커짐! */
+    }
+    40% {
+        opacity: 1;
+        transform: scale(1.0);       /* 제자리 크기로 안착 */
+    }
+    100% {
+        opacity: 0;                  /* 마지막에 천천히 투명해지며 사라짐 */
+        transform: scale(1.05);      /* 살짝 퍼지는 느낌 부여 */
+    }
+}
+
+/* ========================= */
+/* 나무검 전용 회전 애니메이션 */
+/* ========================= */
+
+.spinning-projectile {
+    /* 기존 .projectile 스타일을 이어받으면서 회전 애니메이션 추가 */
+    animation: spin-flying 0.45s linear infinite;
+}
+
+@keyframes spin-flying {
+    from {
+        /* JS에서 지정한 기본 각도부터 시작 */
+        transform: rotate(var(--base-angle, 0deg));
+    }
+    to {
+        /* 날아가는 동안 360도 한 바퀴 빙글 회전! */
+        transform: rotate(calc(var(--base-angle, 0deg) + 360deg));
+    }
+}
+
+/* ========================= */
+/* 3연속 거대 참격 궁극기 연출 */
+/* ========================= */
+
+.ultimate-slash {
+    position: absolute;
+    width: 900px;              /* 적 전체를 뒤덮는 거대 크기 */
+    height: 300px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: 10000;
+    
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    
+    transform-origin: center center;
+    animation: ult-combo-slash 0.35s ease-out forwards;
+}
+
+@keyframes ult-combo-slash {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3) rotate(-10deg);
+    }
+    30% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2) rotate(5deg); /* 타격감 있게 큼직하게 내리침 */
+    }
+    70% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.0) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.1) scaleY(0.1); /* 스르륵 가늘어지며 소멸 */
+    }
+}
+
+/* 궁극기 사용 시 화면 번쩍임 연출용 */
+.screen-flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    opacity: 0.4;
+    z-index: 99999;
+    pointer-events: none;
 }

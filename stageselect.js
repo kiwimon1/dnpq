@@ -112,12 +112,42 @@ stageMapScroll.addEventListener("click", () => {
     stageInfoPanel.style.display = "none";
 });
 
+// ===========================================================
+// 수정된 스테이지 시작 및 복귀 함수 (페이드 효과 추가)
+// ===========================================================
+
 function startStageBattle(stage, index){
-    currentStageIndex = index;
-    stageInfoPanel.style.display = "none";
-    stageSelect.style.display = "none";
-    gameStage.style.display = "flex";
-    initBattle(stage); // battle.js
+    // 1. 화면을 부드럽게 어둡게 만듭니다.
+    fade.style.opacity = "1";
+
+    // 2. 완전히 어두워진 후(0.7초 뒤) 화면을 전환합니다.
+    setTimeout(() => {
+        currentStageIndex = index;
+        stageInfoPanel.style.display = "none";
+        stageSelect.style.display = "none";
+        gameStage.style.display = "flex";
+        initBattle(stage); // battle.js
+
+        // 3. 전환이 끝나면 화면을 다시 밝게 만듭니다.
+        fade.style.opacity = "0";
+    }, 700);
+}
+
+// 전투가 끝나면(승/패 상관없이) 이 함수로 스테이지 화면에 돌아온다.
+function returnToStageSelect(){
+    // 1. 화면을 부드럽게 어둡게 만듭니다.
+    fade.style.opacity = "1";
+
+    // 2. 완전히 어두워진 후(0.7초 뒤) 스테이지 선택 화면으로 전환합니다.
+    setTimeout(() => {
+        gameStage.style.display = "none";
+        battleResultEl.style.display = "none";
+        stageSelect.style.display = "flex";
+        renderStageMap();
+
+        // 3. 전환이 끝나면 화면을 다시 밝게 만듭니다.
+        fade.style.opacity = "0";
+    }, 700);
 }
 
 // 전투가 끝나면(승/패 상관없이) 이 함수로 스테이지 화면에 돌아온다.
